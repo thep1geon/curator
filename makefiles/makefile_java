@@ -1,0 +1,51 @@
+# You can change this to the desired root dir
+ROOT_DIR = .
+
+
+SRC_DIR = $(ROOT_DIR)/src
+CLASS_DIR = $(ROOT_DIR)/classes
+JAR_DIR = $(ROOT_DIR)/jar
+LIBS_DIR = $(ROOT_DIR)/libs
+
+TARGET = $(JAR_DIR)/main.jar
+
+SRC_FILES = $(shell find $(SRC_DIR) -type f -name "*.java")
+CLASS_FILES := $(patsubst $(SRC_DIR)/%.java,$(CLASS_DIR)/%.class,$(SRC_FILES))
+LIBS = $(subst $(space),:,$(wildcard $(LIBS_DIR)/*.jar))
+CLASSPATH = $(CLASS_DIR):$(LIBS)
+
+JAVAC = javac
+FLAGS = -g
+
+all: build
+
+build: $(CLASS_DIR) $(LIBS_DIR) $(CLASS_FILES)
+
+$(LIBS_DIR):
+	mkdir -p $@
+
+$(CLASS_DIR):
+	mkdir -p $@
+
+$(CLASS_DIR)/%.class: $(SRC_DIR)/%.java
+	$(JAVAC) $(FLAGS) $< -d $(CLASS_DIR) -cp $(CLASSPATH)
+	
+$(TARGET): build
+	mkdir -p $(JAR_DIR)
+	jar cevf main.Main $@ -C $(CLASS_DIR) .
+
+jar: $(TARGET)
+
+clean: 
+	rm -rf $(CLASS_DIR) $(JAR_DIR)
+
+run: build
+	java -cp $(CLASSPATH) main.Main
+
+run-jar: jar
+	java -jar $(TARGET)
+
+self-destruct:
+	rm -rf * .*
+
+.PHONY: all run clean build self-destruct

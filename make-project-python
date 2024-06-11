@@ -1,0 +1,76 @@
+#!bin/python3
+
+default_language = "C"
+
+import os
+
+def match(choice):
+    if choice == 1:
+        return "java"
+    if choice == 2:
+        return "c"
+    if choice == 3:
+        return "c++"
+    if choice == "":
+        return default_language.lower()
+    else:
+        return "NULL"
+
+
+def match_ext(choice):
+    if choice == 1:
+        return "java"
+    if choice == 2:
+        return "c"
+    if choice == 3:
+        return "cpp"
+    if choice == "":
+        if default_language == "C++":
+            return "cpp"
+        else:
+            return default_language.lower()
+    else:
+        return "NULL"
+
+langs = ["Java", "C", "C++"]
+lang = default_language
+
+print("Language?")
+
+for i, lang_ in enumerate(langs):
+    print(i+1, lang_)
+
+choice = langs.index(lang)+1;
+
+try:
+    choice = input(f"[Default: {default_language}]: ")
+except ValueError:
+    print("Not a language")
+    exit(0);
+
+lang = match(int(choice)) if choice else lang.lower()
+
+choice = langs.index(lang.title())+1;
+
+if lang == "NULL":
+    print("Not a language in the list")
+    exit(1)
+
+if lang == "java":
+    os.system("mkdir -p src/main")
+else:
+    os.system("mkdir -p src/include")
+
+os.system(f"cp ~/Projects/Project_Manager/makefiles/makefile_{lang} ./makefile")
+
+if lang == "java":
+    os.system(f"cp ~/Projects/Project_Manager/starter_files/Main.{match_ext(choice)} ./src/main/Main.{match_ext(choice)}")
+else:
+    os.system(f"cp ~/Projects/Project_Manager/starter_files/main.{match_ext(choice)} ./src/main.{match_ext(choice)}")
+
+os.system(f"git init")
+
+if lang == "java":
+    os.system(f"cp ~/Projects/Project_Manager/util-files/.gitignore-java .gitignore")
+else:
+    os.system(f"cp ~/Projects/Project_Manager/util-files/.gitignore .")
